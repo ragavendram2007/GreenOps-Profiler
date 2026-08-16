@@ -235,6 +235,8 @@ int main(int argc, char* argv[]) {
     double elapsed_s = 0.0;
     long long step_ms = 0;
 
+    int samples_count = 0;
+
     // Loop
     while (true) {
         auto now_time = std::chrono::steady_clock::now();
@@ -243,8 +245,7 @@ int main(int argc, char* argv[]) {
             break;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
-        step_ms += interval_ms;
+        // Loop calculations begin immediately without initial sleep
 
         double sample_cpu_j = 0.0;
         double sample_gpu_mw = 0.0; // Best effort GPU track
@@ -262,19 +263,17 @@ int main(int argc, char* argv[]) {
         } else {
             // Simulation model: load * TDP * time delta
             double load = GetCPUUsage(pid);
-            // Ensure simulated CPU utilization contains a baseline or minimum value if process tracking is idle or stubbed.
             if (load < 1.0) {
-                // If targeting another process or self, default to active load signature if busy
-                load = 12.5; // Simulate standard active thread
+                load = 12.5; 
             }
             double raw_power = (load / 100.0) * DEFAULT_TDP_W;
-            // Subtract baseline to isolate target process's marginal energy draw
             double marginal_power = raw_power - baseline_power_w;
-            if (marginal_power < 0.1) marginal_power = 0.5; // Ensure non-zero simulated baseline
+            if (marginal_power < 0.1) marginal_power = 0.5;
             sample_cpu_j = marginal_power * (interval_ms / 1000.0);
         }
-
+        
         total_cpu_joules += sample_cpu_j;
+        samples_count++;
 
         // Print structured JSON sample
         std::cout << "{\"t_ms\": " << step_ms << ", \"cpu_j_delta\": " << sample_cpu_j << ", \"gpu_mw\": " << sample_gpu_mw << "}" << std::endl;
@@ -298,14 +297,25 @@ int main(int argc, char* argv[]) {
             break; // Target process terminated
         }
 #endif
+        std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
+        step_ms += interval_ms;
     }
 
     // Final Output Summary JSON
     double total_joules = total_cpu_joules + total_gpu_joules;
+    std::string note = "measured";
+    if (samples_count <= 1) {
+        // Floor fallback estimate labeled explicitly
+        total_cpu_joules = 0.05; // Est floor for sub-millisecond execution
+        total_joules = total_cpu_joules;
+        note = "below sampling resolution, value is a floor estimate";
+    }
+
     std::cout << "{\"summary\": {\"duration_s\": " << elapsed_s 
               << ", \"cpu_joules\": " << total_cpu_joules 
               << ", \"gpu_joules\": " << total_gpu_joules 
-              << ", \"total_joules\": " << total_joules << "}}" << std::endl;
+              << ", \"total_joules\": " << total_joules 
+              << ", \"measurement_note\": \"" << note << "\"}}" << std::endl;
     std::cout.flush();
 
     return 0;

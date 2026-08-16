@@ -114,7 +114,8 @@ app.post('/profile', (req, res) => {
             }
         });
 
-        // If it's iterative, mark lines with low energy consumption (green baseline)
+        // Check if resolution limit was flagged
+        const measurementNote = summary.measurement_note || "measured";
         const suggestions = [];
         if (isRecursive && summary.total_joules > ENERGY_THRESHOLD_JOULES) {
             suggestions.push({
@@ -122,9 +123,12 @@ app.post('/profile', (req, res) => {
                 message: `This script uses recursive calls consuming ${summary.total_joules.toFixed(2)} Joules. Consider refactoring to an iterative approach (O(n)) to save ~90% energy.`
             });
         } else {
+            const msg = measurementNote.includes("below") 
+                ? `Iterative Fibonacci completed instantly (${(summary.duration_s * 1000).toFixed(2)} ms). Energy is a resolution floor estimate (~${summary.total_joules} J).`
+                : `Excellent performance! Iterative Fibonacci executed efficiently. Total energy: ${summary.total_joules.toFixed(3)} J.`;
             suggestions.push({
                 type: 'info',
-                message: `Excellent performance! Iterative Fibonacci executed efficiently. Total energy: ${summary.total_joules.toFixed(3)} J.`
+                message: msg
             });
         }
 
@@ -143,7 +147,8 @@ app.post('/profile', (req, res) => {
                 gpu_joules: summary.gpu_joules,
                 total_joules: summary.total_joules,
                 gCO2eq: carbonFootprint,
-                carbonIntensityFactorUsed: CARBON_INTENSITY_FACTOR
+                carbonIntensityFactorUsed: CARBON_INTENSITY_FACTOR,
+                measurement_note: measurementNote
             },
             flaggedLines,
             suggestions

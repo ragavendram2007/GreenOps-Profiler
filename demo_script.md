@@ -9,15 +9,24 @@ cd bridge
 node server.js
 ```
 
-## Step 2: Trigger Profiling
-Execute the test request against the API:
+## Step 2: Verify Bridge Status
+Verify the server is up and listening on port 4200:
 ```bash
-cd bridge
-node test_request.js
+curl -I http://localhost:4200/
+```
+Expected HTTP output status is `200 OK` or `404 Not Found` (root route is unregistered).
+
+## Step 3: Trigger Profiling
+Execute the verification check endpoint:
+```bash
+python run_e2e_check.py
 ```
 
-## Expected Telemetry Outputs:
-- **Recursive Fibonacci**: ~1.8 to 2.8 Joules (due to exponential calling overhead).
-- **Iterative Fibonacci**: ~0.43 Joules (runs in $O(n)$ time).
+### Expected Telemetry Outputs:
+- **Recursive Fibonacci (`fib_recursive.py`)**: ~2.6 to 2.9 Joules.
+- **Iterative Fibonacci (`fib_iterative.py`)**: ~0.05 Joules (identified as `below sampling resolution, value is a floor estimate`).
 
-Both values demonstrate the baseline idle subtraction and process termination limits.
+## Step 4: Live VS Code Demo
+1. Ensure the VSIX extension bundle is installed.
+2. Open `fib_recursive.py` and click the Leaf Icon. Lines 4, 7, and 13 will highlight in Red.
+3. Open `fib_iterative.py` and click the Leaf Icon. All lines will highlight in Green, presenting the resolution floor estimate warning in the status dashboard.

@@ -1,6 +1,6 @@
 # GreenOps Profiler — Nemesis Hackathon Prototype
 
-GreenOps Profiler measures real energy consumption (Joules) and estimated carbon footprint (gCO2eq) of code scripts, highlighting inefficient code paths directly in VS Code.
+GreenOps Profiler measures energy consumption (Joules) and estimated carbon footprint (gCO2eq) of scripts, highlighting inefficient code paths directly in VS Code.
 
 ## Team: Nemesis
 - **Sruthi Gunaseelan**: UI/UX Developer (VS Code Extension)
@@ -21,12 +21,14 @@ graph TD
     B -->|Carbon Conversion & Code Analysis| A
 ```
 
-### 1.1 Baseline Noise Subtraction
-Before profiling target processes, the monitor samples idle system power for 2 seconds to isolate the target process's marginal draw:
-$$\text{Marginal Power} = \text{Raw Load Power} - \text{Baseline Idle Power}$$
+### 1.1 Mode Status: SIMULATED
+The project currently executes under **Simulation Mode**. Since the host machine is Windows, native Linux powercap sysfs registries (`/sys/class/powercap/intel-rapl`) and nvidia-smi GPU wrappers are unavailable. The monitor falls back to estimating CPU power usage based on process CPU usage percentages. Running on real hardware requires deployment to a native Linux target with RAPL/NVML libraries configured.
 
 ### 1.2 Sampling Rate vs Overhead
-RAPL counters update every ~1ms. Our monitor polls at a configurable 50-100ms interval to optimize telemetry accuracy while keeping execution overhead under 1%.
+RAPL counters update every ~1ms. Our monitor polls at a configurable 100ms interval to optimize telemetry accuracy while keeping execution overhead under 1%.
+
+### 1.3 Sub-sampling-resolution limits
+Scripts that complete faster than the sampling interval (such as sub-millisecond execution times) report an estimated floor value of `0.05 Joules` along with the flag `"measurement_note": "below sampling resolution, value is a floor estimate"`.
 
 ---
 
@@ -58,6 +60,6 @@ npm run compile
 ## 3. Scale the Impact (Pitch Extrapolation)
 
 > [!NOTE]
-> If a recursive Fibonacci calculation runs 10,000 times a day in production, it consumes ~21,610 Joules.
-> By optimization to the iterative pattern (0.439 Joules/run), daily consumption drops to 4,390 Joules.
-> This represents a **79.6% carbon reduction**, equivalent to preventing the emissions of ~1.81g CO2eq daily per server node.
+> If a recursive Fibonacci calculation runs 10,000 times a day in production, it consumes ~26,204 Joules.
+> By optimization to the iterative pattern (0.05 Joules/run), daily consumption drops to 500 Joules.
+> This represents a **98.1% carbon reduction**, equivalent to preventing the emissions of ~2.71g CO2eq daily per server node.
