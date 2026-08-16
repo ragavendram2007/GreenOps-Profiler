@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GreenOps Profiler Dashboard</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg0: #07111c;
+            --bg1: #0c1726;
+            --panel: rgba(15, 23, 42, 0.86);
+            --panel2: rgba(11, 18, 32, 0.96);
+            --text: #e6eef7;
+            --muted: #91a4bb;
+            --leaf: #34c759;
+            --leaf-soft: rgba(52, 199, 89, 0.15);
+            --warn: #ff453a;
+            --warn-soft: rgba(255, 69, 58, 0.14);
+            --border: rgba(148, 163, 184, 0.18);
+            --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text);
+            font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(52, 199, 89, 0.18), transparent 28%),
+                radial-gradient(circle at top right, rgba(255, 69, 58, 0.14), transparent 24%),
+                linear-gradient(180deg, var(--bg0), var(--bg1));
+            padding: 28px;
+        }
+        .shell {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+        }
+        .hero-copy {
+            padding: 28px;
+        }
+        .eyebrow {
+            color: var(--leaf);
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+        h1 {
+            margin: 0 0 14px;
+            font-size: clamp(32px, 5vw, 60px);
+            line-height: 0.98;
+        }
+        .lede {
+            margin: 0;
+            color: var(--muted);
+            max-width: 68ch;
+            line-height: 1.6;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 22px;
+        }
+        button {
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 18px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 120ms ease, filter 120ms ease;
+        }
+        button:hover { transform: translateY(-1px); filter: brightness(1.04); }
+        .primary { background: linear-gradient(135deg, #8df6a5, var(--leaf)); color: #0a111c; }
+        .danger { background: linear-gradient(135deg, #ff9087, var(--warn)); color: #0a111c; }
+        .ghost { background: rgba(219, 231, 243, 0.92); color: #0a111c; }
+        .mini {
+            padding: 18px;
+            display: grid;
+            gap: 12px;
+            align-content: center;
+        }
+        .stat {
+            padding: 16px;
+            border-radius: 16px;
+            background: var(--panel2);
+            border: 1px solid var(--border);
+        }
+        .stat label {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .stat strong { font-size: 24px; }
+        .message {
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: rgba(7, 16, 26, 0.96);
+            border: 1px solid var(--border);
+            color: #c8d6e6;
+            min-height: 58px;
+            white-space: pre-wrap;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        .card {
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--panel);
+        }
+        .card h2 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .badge.ok { background: var(--leaf-soft); color: #a9efbb; }
+        .badge.warn { background: var(--warn-soft); color: #ffb8b2; }
+        .line {
+            margin-top: 10px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
+        }
+        .line.red {
+            background: rgba(255, 69, 58, 0.1);
+            border-color: rgba(255, 69, 58, 0.45);
+        }
+        .line.green {
+            background: rgba(52, 199, 89, 0.08);
+            border-color: rgba(52, 199, 89, 0.28);
+        }
+        .footer {
+            margin-top: 18px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        @media (max-width: 920px) {
+            body { padding: 16px; }
+            .hero { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <section class="hero">
+            <div class="panel hero-copy">
+                <div class="eyebrow">GreenOps Profiler</div>
+                <h1>View the demo in localhost.</h1>
+                <p class="lede">
+                    The VS Code extension opens a webview panel, but this browser dashboard lets you see the same profiling flow on <strong>localhost:4200</strong>.
+                    Use the buttons below to profile the bundled recursive and iterative Fibonacci scripts.
+                </p>
+                <div class="controls">
+                    <button class="danger" onclick="profileDemo('recursive')">Profile recursive demo</button>
+                    <button class="primary" onclick="profileDemo('iterative')">Profile iterative demo</button>
+                    <button class="ghost" onclick="clearResults()">Clear results</button>
+                </div>
+                <div id="message" class="message">Ready. Click a demo button to start profiling.</div>
+            </div>
+            <div class="panel mini">
+                <div class="stat">
+                    <label>Bridge</label>
+                    <strong>localhost:4200</strong>
+                </div>
+                <div class="stat">
+                    <label>Response</label>
+                    <strong>Profile JSON</strong>
+                </div>
+                <div class="stat">
+                    <label>Dashboard</label>
+                    <strong>Browser view</strong>
+                </div>
+            </div>
+        </section>
+
+        <section id="results" class="grid"></section>
+
+        <div class="footer">
+            If you still want the VS Code overlay, open the script file and click the leaf icon in the extension status bar.
+        </div>
+    </div>
+
+    <script>
+        const demoScripts = {
+            recursive: '/monitor/tests/fib_recursive.py',
+            iterative: '/monitor/tests/fib_iterative.py'
+        };
+
+        const message = document.getElementById('message');
+        const results = document.getElementById('results');
+
+        function setMessage(text) {
+            message.textContent = text;
+        }
+
+        function clearResults() {
+            results.innerHTML = '';
+            setMessage('Results cleared. Ready for another run.');
+        }
+
+        function renderResult(data) {
+            const summary = data.summary || {};
+            const flagged = data.flaggedLines || [];
+            const suggestions = data.suggestions || [];
+            const statusLabel = flagged.length > 0 ? 'Hotspots detected' : 'Clean baseline';
+            const statusClass = flagged.length > 0 ? 'warn' : 'ok';
+
+            results.innerHTML = `
+                <article class="card">
+                    <div class="badge ${statusClass}">${statusLabel}</div>
+                    <h2>${data.script}</h2>
+                    <div class="line">Energy: <strong>${Number(summary.total_joules || 0).toFixed(3)} J</strong></div>
+                    <div class="line">Carbon: <strong>${Number(summary.gCO2eq || 0).toFixed(6)} gCO2eq</strong></div>
+                    <div class="line">Duration: <strong>${Number(summary.duration_s || 0).toFixed(4)} s</strong></div>
+                    <div class="line">Note: ${summary.measurement_note || 'measured'}</div>
+                </article>
+                <article class="card">
+                    <div class="badge ${statusClass}">Highlighted lines</div>
+                    <h2>Code map</h2>
+                    ${flagged.length > 0
+                        ? flagged.map((item) => `<div class="line red">Line ${item.line}: ${item.content}<br />${item.reason}</div>`).join('')
+                        : '<div class="line green">No hotspots flagged. All lines stay green.</div>'}
+                </article>
+                <article class="card">
+                    <div class="badge ${suggestions.length > 0 && suggestions[0].type === 'warning' ? 'warn' : 'ok'}">Dashboard message</div>
+                    <h2>Status summary</h2>
+                    ${suggestions.length > 0
+                        ? suggestions.map((item) => `<div class="line ${item.type === 'warning' ? 'red' : 'green'}">${item.message}</div>`).join('')
+                        : '<div class="line green">No additional suggestions.</div>'}
+                </article>
+            `;
+        }
+
+        async function profileDemo(mode) {
+            const scriptPath = demoScripts[mode];
+            setMessage(`Profiling ${mode} demo...`);
+
+            try {
+                const response = await fetch('/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scriptPath })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Profile request failed');
+                }
+
+                renderResult(data);
+                setMessage(`Completed ${mode} demo. Total energy: ${Number(data.summary.total_joules || 0).toFixed(3)} J.`);
+            } catch (error) {
+                setMessage(`Error: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

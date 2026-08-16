@@ -9,6 +9,7 @@ const PORT = 4200;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Default carbon-intensity fallback: US average ~380 gCO2eq/kWh -> 0.000105 gCO2eq per Joule
 // (1 Joule = 2.77778e-7 kWh. 380 * 2.77778e-7 = 0.0001055 gCO2eq/Joule)
@@ -17,6 +18,22 @@ const CARBON_INTENSITY_FACTOR = 0.0001055;
 // Heuristic threshold: flag lines/regions that consume more than 0.5 Joules per run
 const ENERGY_THRESHOLD_JOULES = 0.5;
 
+function resolveScriptPath(scriptPath) {
+    if (fs.existsSync(scriptPath)) {
+        return scriptPath;
+    }
+
+    if (scriptPath.startsWith('/')) {
+        const normalized = scriptPath.replace(/^\/+/, '');
+        const candidate = path.join(__dirname, '..', normalized);
+        if (fs.existsSync(candidate)) {
+            return candidate;
+        }
+    }
+
+    return scriptPath;
+}
+
 app.post('/profile', (req, res) => {
     const { scriptPath } = req.body;
 
@@ -24,14 +41,16 @@ app.post('/profile', (req, res) => {
         return res.status(400).json({ error: 'Missing parameter scriptPath' });
     }
 
-    if (!fs.existsSync(scriptPath)) {
+    const resolvedScriptPath = resolveScriptPath(scriptPath);
+
+    if (!fs.existsSync(resolvedScriptPath)) {
         return res.status(404).json({ error: `Target script file not found at: ${scriptPath}` });
     }
 
-    console.log(`[Bridge] Starting profiling request for script: ${scriptPath}`);
+    console.log(`[Bridge] Starting profiling request for script: ${resolvedScriptPath}`);
 
     // Spawn script in background
-    const targetProcess = spawn('python', [scriptPath]);
+    const targetProcess = spawn('python', [resolvedScriptPath]);
     const pid = targetProcess.pid;
 
     // Spawn C++ Power Monitor targeting the pid
@@ -80,10 +99,10 @@ app.post('/profile', (req, res) => {
         const carbonFootprint = summary.total_joules * CARBON_INTENSITY_FACTOR;
 
         // Static Code Analysis / Inefficiency Heuristics Assignment
-        // In a true product, we align line execution traces. 
-        // Here, we scan the file content for standard hotspots (like recursive calls, naive loops) 
+        // In a true product, we align line execution traces.
+        // Here, we scan the file content for standard hotspots (like recursive calls, naive loops)
         // and attribute the measured energy delta dynamically.
-        const codeLines = fs.readFileSync(scriptPath, 'utf8').split('\n');
+        const codeLines = fs.readFileSync(resolvedScriptPath, 'utf8').split('\n');
         const flaggedLines = [];
 
         let isRecursive = false;
@@ -123,7 +142,7 @@ app.post('/profile', (req, res) => {
                 message: `This script uses recursive calls consuming ${summary.total_joules.toFixed(2)} Joules. Consider refactoring to an iterative approach (O(n)) to save ~90% energy.`
             });
         } else {
-            const msg = measurementNote.includes("below") 
+            const msg = measurementNote.includes("below")
                 ? `Iterative Fibonacci completed instantly (${(summary.duration_s * 1000).toFixed(2)} ms). Energy is a resolution floor estimate (~${summary.total_joules} J).`
                 : `Excellent performance! Iterative Fibonacci executed efficiently. Total energy: ${summary.total_joules.toFixed(3)} J.`;
             suggestions.push({
@@ -134,7 +153,7 @@ app.post('/profile', (req, res) => {
 
         res.json({
             success: true,
-            script: path.basename(scriptPath),
+            script: path.basename(resolvedScriptPath),
             team: "Nemesis",
             roles: {
                 "Sruthi Gunaseelan": "UI/UX Developer (VS Code Extension)",
@@ -159,3 +178,4 @@ app.post('/profile', (req, res) => {
 app.listen(PORT, () => {
     console.log(`[Bridge] Server listening on http://localhost:${PORT}`);
 });
+
