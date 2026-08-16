@@ -1,0 +1,13 @@
+{
+  "name": "greenops-bridge",
+  "version": "1.0.0",
+  "description": "Local bridge connecting GreenOps VS Code UI extension to the C++ Telemetry Monitor",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5"
+  }
+}

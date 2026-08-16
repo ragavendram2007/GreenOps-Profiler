@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+out/
+.vscode-test/
+
+# Compiled Binary
+*.exe
+*.o
+*.obj
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile

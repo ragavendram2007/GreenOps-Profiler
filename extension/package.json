@@ -1,0 +1,41 @@
+{
+  "name": "greenops-profiler",
+  "displayName": "GreenOps Profiler",
+  "description": "Measures energy consumption and highlights carbon footprints in your code.",
+  "version": "1.0.0",
+  "publisher": "nemesis",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "greenops-profiler.profile",
+        "title": "Run GreenOps Profiler"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "greenops-profiler.profile",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.75.0",
+    "@types/node": "^16.11.7",
+    "typescript": "^4.9.5"
+  }
+}
