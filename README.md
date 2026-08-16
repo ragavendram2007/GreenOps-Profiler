@@ -3,9 +3,9 @@
 GreenOps Profiler measures energy consumption (Joules) and estimated carbon footprint (gCO2eq) of scripts, highlighting inefficient code paths directly in VS Code.
 
 ## Team: Nemesis
-- **Sruthi Gunaseelan**: UI/UX Developer (VS Code Extension)
-- **Ragavendra M**: Systems Bridge & API Architect (Node.js/Express)
-- **Venkataraam VG**: Power Monitor Engineer (C++ & HW Telemetry)
+- **Sruthi Gunaseelan**: UI/UX Developer (VS Code Extension).
+- **Ragavendra M**: Systems Bridge & API Architect (Node.js/Express).
+- **Venkataraam VG**: Power Monitor Engineer (C++ & HW Telemetry).
 
 ---
 
