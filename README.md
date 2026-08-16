@@ -9,7 +9,7 @@ GreenOps Profiler measures energy consumption (Joules) and estimated carbon foot
 
 ---
 
-## 1. System Architecture
+## 1. System Architecture/Workflow
 
 ```mermaid
 graph TD
