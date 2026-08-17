@@ -250,6 +250,20 @@ function showGreenOpsDashboard(data: any, context: vscode.ExtensionContext) {
                 </div>
             </div>
 
+            <div style="background: #252526; border: 1px solid #3c3c3c; border-radius: 8px; padding: 20px; margin-bottom: 32px;">
+                <h3 style="margin-top: 0; color: #34C759;">☁️ Cloud Scale Estimator</h3>
+                <p style="margin: 0 0 8px 0; font-size: 14px; color: #8e8e93;">Extrapolated daily consumption metrics at scale (10,000 runs/day):</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div>
+                        <strong style="color: #fff; font-size: 16px;">Daily Energy:</strong> ${(summary.scaleEstimate.daily_joules).toFixed(1)} Joules
+                    </div>
+                    <div>
+                        <strong style="color: #fff; font-size: 16px;">Daily Carbon:</strong> ${(summary.scaleEstimate.daily_gCO2eq).toFixed(4)} gCO2eq
+                    </div>
+                </div>
+                <p style="margin: 12px 0 0 0; font-size: 11px; color: #8e8e93; font-style: italic;">*Note: This is an illustrative extrapolation, not a direct measured claim.</p>
+            </div>
+
             <h2>Performance Highlights</h2>
             ${itemsHtml || '<p>🟢 All code regions are executing at efficient baseline levels.</p>'}
 
