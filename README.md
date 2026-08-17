@@ -1,4 +1,5 @@
-# GreenOps Profiler — Nemesis Hackathon Prototype
+# GreenOps Profiler — Nemesis 
+
 
 GreenOps Profiler measures energy consumption (Joules) and estimated carbon footprint (gCO2eq) of scripts, highlighting inefficient code paths directly in VS Code.
 
