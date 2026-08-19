@@ -200,14 +200,14 @@ function showGreenOpsDashboard(data: any, sessionHistory: any[], context: vscode
             <meta charset="utf-8">
             <style>
                 body {
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
                     padding: 24px;
-                    background: #121314;
-                    color: #e0e0e0;
+                    background: #0d0f11;
+                    color: #d1d5db;
                 }
                 .header {
-                    border-bottom: 1px solid #2a2c2e;
-                    padding-bottom: 16px;
+                    border-bottom: 2px solid #1e293b;
+                    padding-bottom: 18px;
                     margin-bottom: 24px;
                     display: flex;
                     justify-content: space-between;
@@ -215,80 +215,88 @@ function showGreenOpsDashboard(data: any, sessionHistory: any[], context: vscode
                 }
                 .header h1 {
                     margin: 0;
-                    font-size: 20px;
-                    color: #00F2FE;
+                    font-size: 18px;
+                    color: #38bdf8;
                     font-family: monospace;
-                    letter-spacing: 1px;
+                    letter-spacing: 2px;
+                    text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
                 }
                 .badge {
-                    background: #2a2c2e;
-                    border: 1px solid #3c3c3c;
-                    border-radius: 4px;
-                    padding: 4px 8px;
-                    font-size: 10px;
-                    color: #8e8e93;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
+                    background: rgba(30, 41, 59, 0.5);
+                    border: 1px solid #334155;
+                    border-radius: 9999px;
+                    padding: 4px 12px;
+                    font-size: 9px;
+                    color: #94a3b8;
+                    font-weight: 600;
+                    letter-spacing: 1px;
                 }
                 .stats-grid {
                     display: grid;
                     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-                    gap: 16px;
-                    margin-bottom: 24px;
+                    gap: 20px;
+                    margin-bottom: 28px;
                 }
                 .stat-box {
-                    background: #1a1b1c;
-                    border: 1px solid #2a2c2e;
-                    border-radius: 6px;
-                    padding: 16px;
-                    text-align: left;
-                    position: relative;
+                    background: #1e293b;
+                    border: 1px solid #334155;
+                    border-radius: 12px;
+                    padding: 20px;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+                    transition: transform 0.2s, border-color 0.2s;
+                }
+                .stat-box:hover {
+                    transform: translateY(-2px);
+                    border-color: #38bdf8;
                 }
                 .stat-box h2 {
-                    margin: 0 0 6px 0;
-                    font-size: 11px;
-                    color: #8e8e93;
+                    margin: 0 0 8px 0;
+                    font-size: 10px;
+                    color: #94a3b8;
                     text-transform: uppercase;
-                    letter-spacing: 0.5px;
+                    letter-spacing: 1px;
+                    font-weight: 700;
                 }
                 .stat-box p {
                     margin: 0;
-                    font-size: 26px;
-                    font-weight: bold;
-                    color: #fff;
+                    font-size: 28px;
+                    font-weight: 800;
+                    color: #f8fafc;
                     font-family: monospace;
+                    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
                 }
                 .card {
-                    background: #1a1b1c;
-                    border: 1px solid #2a2c2e;
-                    border-left: 4px solid #ff453a;
-                    padding: 14px;
-                    margin-bottom: 12px;
-                    border-radius: 4px;
-                    transition: border-color 0.2s, background 0.2s;
+                    background: #1e293b;
+                    border: 1px solid #334155;
+                    border-left: 5px solid #ef4444;
+                    padding: 16px;
+                    margin-bottom: 16px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
                 }
                 .card:hover, .card:focus {
-                    border-color: #ff453a;
-                    background: #201a1b;
+                    border-color: #ef4444;
+                    background: #272125;
+                    transform: translateX(4px);
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
                     outline: none;
                 }
-                .card.warning {
-                    border-left-color: #ff453a;
-                }
                 .footer {
-                    font-size: 11px;
-                    color: #555;
-                    margin-top: 40px;
-                    border-top: 1px solid #2a2c2e;
-                    padding-top: 12px;
+                    font-size: 10px;
+                    color: #64748b;
+                    margin-top: 48px;
+                    border-top: 1px solid #1e293b;
+                    padding-top: 16px;
                     display: flex;
                     justify-content: space-between;
                 }
                 .wave-pulse {
-                    height: 2px;
-                    background: linear-gradient(90deg, transparent, #00F2FE, transparent);
-                    animation: pulse 2.5s infinite linear;
-                    margin-bottom: 24px;
+                    height: 3px;
+                    background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+                    animation: pulse 3s infinite linear;
+                    margin-bottom: 28px;
+                    border-radius: 9999px;
                 }
                 @keyframes pulse {
                     0% { background-position: -200px 0; }
@@ -300,7 +308,6 @@ function showGreenOpsDashboard(data: any, sessionHistory: any[], context: vscode
             <script>
                 const vscode = acquireVsCodeApi();
                 
-                // Count up animation
                 function animateValue(id, start, end, duration, decimals = 2) {
                     const obj = document.getElementById(id);
                     let startTimestamp = null;
@@ -329,48 +336,48 @@ function showGreenOpsDashboard(data: any, sessionHistory: any[], context: vscode
             <div class="wave-pulse"></div>
             
             <div class="stats-grid">
-                <div class="stat-box">
+                <div class="stat-box" style="border-bottom: 3px solid #38bdf8;">
                     <h2>Total Energy</h2>
                     <p><span id="energy-val">0.00</span> J</p>
                 </div>
-                <div class="stat-box">
+                <div class="stat-box" style="border-bottom: 3px solid #10b981;">
                     <h2>Carbon Footprint</h2>
                     <p><span id="carbon-val">0.00</span> mg</p>
                 </div>
-                <div class="stat-box">
+                <div class="stat-box" style="border-bottom: 3px solid #e2e8f0;">
                     <h2>Duration</h2>
                     <p><span id="duration-val">0.00</span> s</p>
                 </div>
             </div>
 
-            <div style="background: #1a1b1c; border: 1px solid #2a2c2e; border-radius: 6px; padding: 16px; margin-bottom: 24px;">
-                <h3 style="margin-top: 0; color: #00F2FE; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; font-family: monospace;">☁️ Cloud Scale Estimator</h3>
-                <p style="margin: 0 0 12px 0; font-size: 12px; color: #8e8e93;">Extrapolated daily consumption metrics at scale (10,000 runs/day):</p>
+            <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);">
+                <h3 style="margin-top: 0; color: #38bdf8; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-family: monospace; font-weight: 700;">☁️ Cloud Scale Estimator</h3>
+                <p style="margin: 0 0 16px 0; font-size: 12px; color: #94a3b8;">Extrapolated daily consumption metrics at scale (10,000 runs/day):</p>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-family: monospace;">
                     <div>
-                        <strong style="color: #8e8e93; font-size: 11px; text-transform: uppercase;">Daily Energy:</strong><br/>
-                        <span style="color: #fff; font-size: 16px;">${(summary.scaleEstimate.daily_joules).toFixed(1)} J</span>
+                        <strong style="color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Daily Energy</strong><br/>
+                        <span style="color: #f8fafc; font-size: 18px; font-weight: 700;">${(summary.scaleEstimate.daily_joules).toFixed(1)} J</span>
                     </div>
                     <div>
-                        <strong style="color: #8e8e93; font-size: 11px; text-transform: uppercase;">Daily Carbon:</strong><br/>
-                        <span style="color: #fff; font-size: 16px;">${(summary.scaleEstimate.daily_gCO2eq).toFixed(4)} g</span>
+                        <strong style="color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Daily Carbon</strong><br/>
+                        <span style="color: #f8fafc; font-size: 18px; font-weight: 700;">${(summary.scaleEstimate.daily_gCO2eq).toFixed(4)} g</span>
                     </div>
                 </div>
-                <p style="margin: 12px 0 0 0; font-size: 9px; color: #555; font-style: italic;">*Note: This is an illustrative extrapolation, not a direct measured claim.</p>
+                <p style="margin: 14px 0 0 0; font-size: 9px; color: #64748b; font-style: italic;">*Note: This is an illustrative extrapolation, not a direct measured claim.</p>
             </div>
 
             ${sessionHistory.length > 1 ? `
-            <div style="background: #1a1b1c; border: 1px solid #2a2c2e; border-radius: 6px; padding: 16px; margin-bottom: 24px;">
-                <h3 style="margin-top: 0; color: #00F2FE; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; font-family: monospace;">📊 Run Comparison History</h3>
+            <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);">
+                <h3 style="margin-top: 0; color: #38bdf8; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-family: monospace; font-weight: 700;">📊 Run Comparison History</h3>
                 ${comparisonHtml}
             </div>
             ` : ''}
 
-            <h2>Performance Highlights</h2>
-            ${itemsHtml || '<p style="color: #34C759;">🟢 All code regions are executing at efficient baseline levels.</p>'}
+            <h2 style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin: 28px 0 16px 0;">Performance Highlights</h2>
+            ${itemsHtml || '<p style="color: #10b981; font-weight: 600; font-size: 14px;">🟢 All code regions are executing at efficient baseline levels.</p>'}
 
             <div class="footer">
-                <div>Team: Nemesis</div>
+                <div>Nemesis Team Dashboard</div>
                 <div>Sruthi Gunaseelan, Ragavendra M, Venkataraam VG</div>
             </div>
         </body>
